@@ -24,12 +24,19 @@ function Film_Library(){
         this.film = this.film.filter(f => f.filmID !== IDfilm);
     }
 
+    /*
+    con cilo for
     this.updateRating = (id, rating) =>{
         for(const f of this.film){
             if(f.filmID === id){
                 f.rating = rating;
             }
         }
+    }*/
+
+    this.updateRating = (id, rating) => {
+        const filmRchange = this.film.find(f => f.filmID === id);
+        filmRchange.rating = rating;
     }
 
 }
@@ -52,30 +59,31 @@ film_library.addFilm(film6);
 
 
 
-/*console.log("sorted film by watch date");
+console.log("sorted film by watch date");
 film_library.film.sort((a, b) => a.date - b.date);
 
 for(const film of film_library.film){
-    console.log(film.printFilm());
+    film.printFilm();
 }
 
 console.log("sorted film by rating")
 film_library.film.sort((a, b) => b.rating - a.rating);
 
 for(const film of film_library.film){
-    console.log(film.printFilm());
+    film.printFilm();
 }
 
 console.log("Delete films with id = 1")
 film_library.removeFilm(1);
 
 for(const film of film_library.film){
-    console.log(film.printFilm());
-}*/
+    film.printFilm();
+}
 
 console.log("Update rating of film with id 4 from 3 to 1")
 film_library.updateRating(4, 1);
 
 for(const film of film_library.film){
-    console.log(film.printFilm());
+    film.printFilm();
 }
+
