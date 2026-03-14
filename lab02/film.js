@@ -5,6 +5,10 @@ const db = new sqlite.Database('films.db', (err) => {
     if(err) console.log("Database not connected");
 });
 
+const db_copy = new sqlite.Database('films_copy.db', (err) => {
+    if (err) console.log("Database copy not connected");
+})
+
 function Film(filmID, title, favourite = false, date, rating = null, userID = 1){
     this.filmID = filmID;
     this.title = title;
@@ -69,6 +73,36 @@ function Film_Library(){
         })
     }
 
+    this.addMovie = (title, isFavorite, rating = NULL, watchDate = NULL, userID) => {
+        return new Promise((resolve, reject) => {
+            const query = 'INSERT INTO films(title, isFavorite, rating, watchDate, userID) VALUES(?, ?, ?, ?, ?)';
+            db_copy.run(query, [title, isFavorite, rating, watchDate, userID], function(err){
+                if(err) reject("Error during insertion of new film");
+                else resolve(console.log("Insertion success!"));
+            })
+        })
+    }
+
+    this.deleteMovie = (id) => {
+        return new Promise((resolve, reject) => {
+            const query = 'DELETE FROM films WHERE id = ?';
+            db_copy.run(query, [id], function(err) {
+                if(err) reject("Error during elimination of a film");
+                else resolve(console.log("Elimination success!"));
+            })
+        })
+    }
+
+    this.deleteWatchDate = () => {
+        return new Promise((resolve, reject) => {
+            const query = "UPDATE films SET watchDate = NULL";
+            db_copy.run(query, function(err){
+                if(err) reject("Error during deleting all watchDate");
+                else resolve(console.log("All watchDate cancelled!"));
+            })
+        })
+    }
+
 }
 
 const film_library = new Film_Library();
@@ -100,6 +134,18 @@ film_library.getAllFilms().then(films => {
 })
 .then(films => {
     print_films(films);
+})
+/*.then(() => {
+    console.log("\nINSERT A NEW FILM:");
+    return film_library.addMovie("Suits", 1, 4, "2025-10-21", 3);
+})*/
+.then(() => {
+    console.log("\nELIMINATION OF A FILM:");
+    return film_library.deleteMovie(9)
+})
+.then(() => {
+    console.log("\nDELETING OF ALL WATCHDATE");
+    return film_library.deleteWatchDate();
 }).catch(err => console.log(err));
 
 
