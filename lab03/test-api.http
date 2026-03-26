@@ -1,0 +1,73 @@
+### GET all films
+GET http://localhost:3000/api/films
+
+### GET favorite films
+GET http://localhost:3000/api/films?filter=filter-favorite
+
+### GET best rated films
+GET http://localhost:3000/api/films?filter=filter-best
+
+### GET unseen films
+GET http://localhost:3000/api/films?filter=filter-unseen
+
+### GET films seen in the last month
+GET http://localhost:3000/api/films?filter=filter-lastmonth
+
+### GET a specific film by ID (e.g., ID 1)
+GET http://localhost:3000/api/films/1
+
+### GET a film that does not exist (should return 404)
+GET http://localhost:3000/api/films/999
+
+### POST - Add a new film
+# La risposta dovrebbe essere un 201 Created con l'ID del nuovo film.
+POST http://localhost:3000/api/films
+Content-Type: application/json
+
+{
+    "title": "Nuovo Film di Prova",
+    "isFavorite": true,
+    "rating": 4,
+    "watchDate": "2024-05-20",
+    "userId": 1
+}
+
+### PUT - Update an entire film (e.g., film with ID 2)
+# Questa rotta ora aggiorna l'intero film.
+# Puoi passare solo i campi che vuoi cambiare.
+PUT http://localhost:3000/api/films/2
+Content-Type: application/json
+
+{
+    "title": "Pulp Fiction (Updated)",
+    "isFavorite": false,
+    "rating": 5,
+    "watchDate": "2024-01-01",
+    "userId": 1
+}
+
+
+### PUT - Update only the rating of a film (e.g., film with ID 3)
+PUT http://localhost:3000/api/films/3
+Content-Type: application/json
+
+{
+    "rating": 1
+}
+
+
+### PUT - Update a film that does not exist (should return 404)
+PUT http://localhost:3000/api/films/999
+Content-Type: application/json
+
+{
+    "rating": 5
+}
+
+### DELETE a film (e.g., film with ID 6)
+# NOTA: Questo cancellerà permanentemente il film dal database.
+# La risposta dovrebbe essere un 204 No Content (nessun corpo).
+DELETE http://localhost:3000/api/films/6
+
+### DELETE a film that does not exist (should return 404)
+DELETE http://localhost:3000/api/films/999
