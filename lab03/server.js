@@ -39,7 +39,7 @@ app.get('/api/films/:id', async (req, res) => {
 
 
 app.post('/api/films', async (req, res) => {
-    const favourite = req.body.favourite ? req.body.favourite : false;
+    const favourite = req.body.isFavorite ? req.body.isFavorite : false;
     const rating = req.body.rating ? req.body.rating : false;
     const watchDate = req.body.watchDate ? req.body.watchDate : false;
     const film = new Film(undefined, req.body.title, favourite, rating, watchDate, req.body.userId);
@@ -65,6 +65,29 @@ app.delete('/api/films/:id', async (req, res) => {
     }
 });
 
+
+app.put('/api/films/:id', async(req, res) => {
+    const title = req.body.title;
+    const favorite = req.body.isFavorite;
+    const rating = req.body.rating;
+    const watchDate = req.body.watchDate;
+    try{
+        const film = await filmDao.getFilmById(req.params.id);
+        if (film.error) return res.status(404).json(film);
+        film.title = title;
+        film.favorite = favorite;
+        film.rating = rating;
+        film.watchDate = watchDate;
+        const result = await filmDao.updateFilm(film);
+        if (result.error) {
+            res.status(404).json(result);
+        } else {
+            res.json(result);
+        }
+    }catch (err){
+        res.status(503).json({ error: `Database error for film ${req.params.id}: ${err}` });
+    }
+})
 
 app.put('/api/films/:id/favorite', async (req, res) => {
     const favorite = req.body.favorite;
