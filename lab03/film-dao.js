@@ -92,7 +92,7 @@ export const updateFilm = (film) => {
         const query = 'UPDATE films SET title = ?, isFavorite = ?, rating = ?, watchDate = ? WHERE id = ?';
         const watchDate = film.watchDate ? dayjs(film.watchDate).format("YYYY-MM-DD") : null;
         let rating;
-        if (film.rating === undefined || film.rating < 1 || film.rating > 5) rating = null;
+        if (!film.rating || film.rating < 1 || film.rating > 5) rating = null;
         else rating = film.rating;
         db.run(query, [film.title, film.isFavorite, rating, watchDate, film.id], function (err) {
             if (err) reject(new Error("Error during updating the film"));

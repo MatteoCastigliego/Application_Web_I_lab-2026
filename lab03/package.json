@@ -1,0 +1,19 @@
+{
+  "name": "lab03",
+  "version": "1.0.0",
+  "description": "This repository contains a proposed solution for the third laboratory of the courses. Specifically, this README includes an overview of the files contained in the `solution` folder and a description of each API offered by the server.",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "db.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.20",
+    "express": "^5.2.1",
+    "morgan": "^1.10.1",
+    "sqlite3": "^6.0.1"
+  }
+}
