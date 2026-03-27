@@ -7,6 +7,8 @@ const app = express();
 app.use(morgan('dev'));
 app.use(express.json());
 
+
+/* This function gets all the films that respect the requested filter */
 app.get('/api/films', (req, res) => {
     const filter = req.query.filter;
     if(filter === 'filter-favorite'){
@@ -23,6 +25,7 @@ app.get('/api/films', (req, res) => {
 });
 
 
+/* This function gets the film with an id given as parameter */
 app.get('/api/films/:id', async (req, res) => {
     try {
         const result = await filmDao.getFilmById(req.params.id);
@@ -36,8 +39,7 @@ app.get('/api/films/:id', async (req, res) => {
 });
 
 
-
-
+/* Function that adds a new film in the db */
 app.post('/api/films', async (req, res) => {
     const favourite = req.body.isFavorite ? req.body.isFavorite : false;
     const rating = req.body.rating ? req.body.rating : false;
@@ -52,6 +54,7 @@ app.post('/api/films', async (req, res) => {
 });
 
 
+/* This function is used to delete a film in the db */
 app.delete('/api/films/:id', async (req, res) => {
     const id = req.params.id;
     try {
@@ -66,6 +69,7 @@ app.delete('/api/films/:id', async (req, res) => {
 });
 
 
+/* This function modifies all parameters of a film with a given id */
 app.put('/api/films/:id', async(req, res) => {
     const title = req.body.title;
     const favorite = req.body.isFavorite;
@@ -89,6 +93,8 @@ app.put('/api/films/:id', async(req, res) => {
     }
 })
 
+
+/* Modifies only the parameter isFavorite of a film */
 app.put('/api/films/:id/favorite', async (req, res) => {
     const favorite = req.body.favorite;
     
@@ -108,6 +114,7 @@ app.put('/api/films/:id/favorite', async (req, res) => {
 });
 
 
+/* Modifies only the parameter rating of a film */
 app.put('/api/films/:id/rating', async (req, res) => {
     const rating = req.body.rating;
     try {
@@ -126,7 +133,7 @@ app.put('/api/films/:id/rating', async (req, res) => {
 });
 
 
-// Avvio del server
+/* Start the server */
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
