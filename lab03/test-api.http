@@ -48,7 +48,7 @@ Content-Type: application/json
 
 
 ### PUT - Update only the rating of a film (e.g., film with ID 3)
-PUT http://localhost:3000/api/films/3
+PUT http://localhost:3000/api/films/7/rating
 Content-Type: application/json
 
 {
@@ -57,7 +57,7 @@ Content-Type: application/json
 
 
 ### PUT - Update a film that does not exist (should return 404)
-PUT http://localhost:3000/api/films/999
+PUT http://localhost:3000/api/films/999/rating
 Content-Type: application/json
 
 {
