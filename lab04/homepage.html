@@ -14,71 +14,197 @@
 
 <body>
     <header>
-        <nav class="navbar bg-body-tertiary">
-            <div class="container-fluid">
-                <a class="navbar-brand"><i class="bi bi-film"></i>Film Library</a>
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                    <i class="bi bi-person-check"></i>
+        <nav class="navbar navbar-expand-lg bg-dark py-3 shadow-sm" data-bs-theme="dark">
+            <div class="container-fluid px-4">
+                <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="#">
+                    <i class="bi bi-film text-warning"></i>Film Library
+                </a>
+                <form class="d-none d-md-flex w-50" role="search">
+                    <input class="form-control me-2 rounded-pill border-secondary" type="search" placeholder="Search films..." aria-label="Search" />
+                    <button class="btn btn-outline-warning rounded-pill px-4" type="submit">Search</button>
                 </form>
+                <div class="d-flex align-items-center text-white">
+                    <i class="bi bi-person-circle fs-4 cursor-pointer"></i>
+                </div>
             </div>
         </nav>
     </header>
-    <main>
-        <div class="row">
-            <div class="col-3">
-                <h3>Filters</h3>
-                <ul class="list-group">
-                    <li class="list-group-item active" aria-current="true">All</li>
-                    <li class="list-group-item">Favorited</li>
-                    <li class="list-group-item">Best Rated</li>
-                    <li class="list-group-item">Seen Last Month</li>
-                    <li class="list-group-item">Unseen</li>
-                </ul>
-            </div>
-            <div class="col-9">
-                <h1>All films</h1>
-                <ul class="list-group">
-                    <li class="list-group-item"><i class="bi bi-heart"></i>Pulp Fiction<span class="ms-3">
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star"></i>
-                            <i class="bi bi-star"></i>
-                            <i class="bi bi-star"></i>
-                            <i class="bi bi-star"></i>
-                        </span><i class="bi bi-pencil-square"></i><i class="bi bi-trash3"></i></li>
-                    <li class="list-group-item"><i class="bi bi-heart-fill"></i>La casa di carta<span class="ms-3">
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star"></i>
-                        </span><i class="bi bi-pencil-square"></i><i class="bi bi-trash3"></i></li>
-                    <li class="list-group-item"><i class="bi bi-heart-fill"></i>Suits<span class="ms-3">
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                        </span><i class="bi bi-pencil-square"></i><i class="bi bi-trash3"></i></li>
-                    <li class="list-group-item"><i class="bi bi-heart-half"></i>Breaking bad<span class="ms-3">
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star"></i>
-                            <i class="bi bi-star"></i>
-                        </span><i class="bi bi-pencil-square"></i><i class="bi bi-trash3"></i></li>
-                    <li class="list-group-item"><i class="bi bi-heart-fill"></i>Formula 1<span class="ms-3">
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                            <i class="bi bi-star-fill"></i>
-                        </span><i class="bi bi-pencil-square"></i><i class="bi bi-trash3"></i></li>
-                </ul>
-            </div>
+
+    <main class="container-fluid mt-5 px-4">
+        <div class="row gx-5">
+            <!-- Sidebar: layout a pillole senza bordi -->
+            <aside class="col-md-3 d-none d-md-block">
+                <h6 class="text-uppercase fw-bold text-muted mb-3" style="letter-spacing: 1.5px;">Filters</h6>
+                <div class="nav flex-column nav-pills gap-2">
+                    <a href="#" class="nav-link active bg-dark text-white rounded-pill px-4 py-2 shadow-sm d-flex align-items-center gap-3" aria-current="true">
+                        <i class="bi bi-collection-play"></i> All
+                    </a>
+                    <a href="#" class="nav-link text-dark rounded-pill px-4 py-2 custom-nav-link d-flex align-items-center gap-3">
+                        <i class="bi bi-heart"></i> Favorited
+                    </a>
+                    <a href="#" class="nav-link text-dark rounded-pill px-4 py-2 custom-nav-link d-flex align-items-center gap-3">
+                        <i class="bi bi-star"></i> Best Rated
+                    </a>
+                    <a href="#" class="nav-link text-dark rounded-pill px-4 py-2 custom-nav-link d-flex align-items-center gap-3">
+                        <i class="bi bi-calendar-check"></i> Seen Last Month
+                    </a>
+                    <a href="#" class="nav-link text-dark rounded-pill px-4 py-2 custom-nav-link d-flex align-items-center gap-3">
+                        <i class="bi bi-eye-slash"></i> Unseen
+                    </a>
+                </div>
+            </aside>
+
+            <!-- Main Content: Card list distanziata -->
+            <section class="col-md-9 col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="fw-bold mb-0">All Films</h2>
+                    <span class="badge bg-secondary rounded-pill px-3 py-2 fw-medium">5 Movies</span>
+                </div>
+                
+                <div class="d-flex flex-column gap-3 pb-5">
+                    <!-- Film: Pulp Fiction -->
+                    <div class="card film-card border-0 shadow-sm rounded-4">
+                        <div class="card-body d-flex flex-wrap justify-content-between align-items-center p-3 p-md-4">
+                            <div class="d-flex align-items-center gap-3 col-12 col-md-4 mb-2 mb-md-0">
+                                <div class="bg-danger-subtle rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px;">
+                                    <i class="bi bi-heart text-danger fs-5 cursor-pointer"></i>
+                                </div>
+                                <div>
+                                    <h5 class="film-title mb-1 fw-bold">Pulp Fiction</h5>
+                                    <small class="text-muted d-block d-sm-none"><i class="bi bi-calendar3 me-1"></i>March 11, 2026</small>
+                                </div>
+                            </div>
+                            <div class="text-muted small d-none d-sm-flex align-items-center col-md-3">
+                                <i class="bi bi-calendar3 me-2"></i>March 11, 2026
+                            </div>
+                            <div class="d-flex align-items-center justify-content-md-end gap-4 col-12 col-md-4 mt-2 mt-md-0">
+                                <span class="text-warning fs-5 d-none d-md-block">
+                                    <i class="bi bi-star-fill"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i>
+                                </span>
+                                <div class="d-flex gap-2 ms-auto ms-md-0">
+                                    <button class="btn btn-light rounded-circle action-btn text-secondary border-0 shadow-sm"><i class="bi bi-pencil-square"></i></button>
+                                    <button class="btn btn-light rounded-circle action-btn text-danger border-0 shadow-sm"><i class="bi bi-trash3"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Film: La casa di carta -->
+                    <div class="card film-card border-0 shadow-sm rounded-4">
+                        <div class="card-body d-flex flex-wrap justify-content-between align-items-center p-3 p-md-4">
+                            <div class="d-flex align-items-center gap-3 col-12 col-md-4 mb-2 mb-md-0">
+                                <div class="bg-danger-subtle rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px;">
+                                    <i class="bi bi-heart-fill text-danger fs-5 cursor-pointer"></i>
+                                </div>
+                                <div>
+                                    <h5 class="film-title mb-1 fw-bold">La casa di carta</h5>
+                                    <small class="text-muted d-block d-sm-none"><i class="bi bi-calendar3 me-1"></i>April 15, 2026</small>
+                                </div>
+                            </div>
+                            <div class="text-muted small d-none d-sm-flex align-items-center col-md-3">
+                                <i class="bi bi-calendar3 me-2"></i>April 15, 2026
+                            </div>
+                            <div class="d-flex align-items-center justify-content-md-end gap-4 col-12 col-md-4 mt-2 mt-md-0">
+                                <span class="text-warning fs-5 d-none d-md-block">
+                                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i>
+                                </span>
+                                <div class="d-flex gap-2 ms-auto ms-md-0">
+                                    <button class="btn btn-light rounded-circle action-btn text-secondary border-0 shadow-sm"><i class="bi bi-pencil-square"></i></button>
+                                    <button class="btn btn-light rounded-circle action-btn text-danger border-0 shadow-sm"><i class="bi bi-trash3"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Film: Suits -->
+                    <div class="card film-card border-0 shadow-sm rounded-4">
+                        <div class="card-body d-flex flex-wrap justify-content-between align-items-center p-3 p-md-4">
+                            <div class="d-flex align-items-center gap-3 col-12 col-md-4 mb-2 mb-md-0">
+                                <div class="bg-danger-subtle rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px;">
+                                    <i class="bi bi-heart-fill text-danger fs-5 cursor-pointer"></i>
+                                </div>
+                                <div>
+                                    <h5 class="film-title mb-1 fw-bold">Suits</h5>
+                                    <small class="text-muted d-block d-sm-none"><i class="bi bi-calendar3 me-1"></i>May 10, 2026</small>
+                                </div>
+                            </div>
+                            <div class="text-muted small d-none d-sm-flex align-items-center col-md-3">
+                                <i class="bi bi-calendar3 me-2"></i>May 10, 2026
+                            </div>
+                            <div class="d-flex align-items-center justify-content-md-end gap-4 col-12 col-md-4 mt-2 mt-md-0">
+                                <span class="text-warning fs-5 d-none d-md-block">
+                                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                                </span>
+                                <div class="d-flex gap-2 ms-auto ms-md-0">
+                                    <button class="btn btn-light rounded-circle action-btn text-secondary border-0 shadow-sm"><i class="bi bi-pencil-square"></i></button>
+                                    <button class="btn btn-light rounded-circle action-btn text-danger border-0 shadow-sm"><i class="bi bi-trash3"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Film: Breaking Bad -->
+                    <div class="card film-card border-0 shadow-sm rounded-4">
+                        <div class="card-body d-flex flex-wrap justify-content-between align-items-center p-3 p-md-4">
+                            <div class="d-flex align-items-center gap-3 col-12 col-md-4 mb-2 mb-md-0">
+                                <div class="bg-danger-subtle rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px;">
+                                    <i class="bi bi-heart text-danger fs-5 cursor-pointer"></i>
+                                </div>
+                                <div>
+                                    <h5 class="film-title mb-1 fw-bold">Breaking bad</h5>
+                                    <small class="text-muted d-block d-sm-none"><i class="bi bi-calendar3 me-1"></i>May 21, 2026</small>
+                                </div>
+                            </div>
+                            <div class="text-muted small d-none d-sm-flex align-items-center col-md-3">
+                                <i class="bi bi-calendar3 me-2"></i>May 21, 2026
+                            </div>
+                            <div class="d-flex align-items-center justify-content-md-end gap-4 col-12 col-md-4 mt-2 mt-md-0">
+                                <span class="text-warning fs-5 d-none d-md-block">
+                                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i><i class="bi bi-star"></i>
+                                </span>
+                                <div class="d-flex gap-2 ms-auto ms-md-0">
+                                    <button class="btn btn-light rounded-circle action-btn text-secondary border-0 shadow-sm"><i class="bi bi-pencil-square"></i></button>
+                                    <button class="btn btn-light rounded-circle action-btn text-danger border-0 shadow-sm"><i class="bi bi-trash3"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Film: Formula 1 -->
+                    <div class="card film-card border-0 shadow-sm rounded-4">
+                        <div class="card-body d-flex flex-wrap justify-content-between align-items-center p-3 p-md-4">
+                            <div class="d-flex align-items-center gap-3 col-12 col-md-4 mb-2 mb-md-0">
+                                <div class="bg-danger-subtle rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px;">
+                                    <i class="bi bi-heart-fill text-danger fs-5 cursor-pointer"></i>
+                                </div>
+                                <div>
+                                    <h5 class="film-title mb-1 fw-bold">Formula 1</h5>
+                                    <small class="text-muted d-block d-sm-none"><i class="bi bi-calendar3 me-1"></i>June 02, 2026</small>
+                                </div>
+                            </div>
+                            <div class="text-muted small d-none d-sm-flex align-items-center col-md-3">
+                                <i class="bi bi-calendar3 me-2"></i>June 02, 2026
+                            </div>
+                            <div class="d-flex align-items-center justify-content-md-end gap-4 col-12 col-md-4 mt-2 mt-md-0">
+                                <span class="text-warning fs-5 d-none d-md-block">
+                                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                                </span>
+                                <div class="d-flex gap-2 ms-auto ms-md-0">
+                                    <button class="btn btn-light rounded-circle action-btn text-secondary border-0 shadow-sm"><i class="bi bi-pencil-square"></i></button>
+                                    <button class="btn btn-light rounded-circle action-btn text-danger border-0 shadow-sm"><i class="bi bi-trash3"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     </main>
+
+    <!-- Pulsante Flottante Scuro -->
+    <button class="btn btn-dark btn-floating d-flex align-items-center justify-content-center shadow-lg" title="Add a new film">
+        <i class="bi bi-plus"></i>
+    </button>
 </body>
 
 </html>
