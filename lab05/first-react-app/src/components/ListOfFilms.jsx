@@ -35,7 +35,7 @@ function FilmTable(props) {
                 </tr>
             </thead>
             <tbody>
-                {films.map((f) => <FilmRow key={f.id} film={f} />)}
+                {films.map((f) => <FilmRow film={f} />)}
             </tbody>
         </Table>
     );
