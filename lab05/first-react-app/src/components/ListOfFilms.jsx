@@ -1,6 +1,25 @@
 import { Row, Col, Table, Button } from 'react-bootstrap';
 import { Pencil, Trash, StarFill, Star, HeartFill, Heart } from 'react-bootstrap-icons';
 
+
+function ListOfFilms(props) {
+    return (
+        <>
+            <Row>
+                <Col as='h2' className='text-start'>Filter: {props.activeFilter}</Col>
+            </Row>
+            <Row>
+                <FilmTable films={props.films} />
+            </Row>
+        </>
+    );
+}
+
+export default ListOfFilms;
+
+
+
+
 function FilmTable(props) {
     const films = props.films;
 
@@ -55,17 +74,3 @@ function FilmActionButtons(props) {
     );
 }
 
-function ListOfFilms(props) {
-    return (
-        <>
-            <Row>
-                <Col as='h2' className='text-start'>Filter: {props.activeFilter}</Col>
-            </Row>
-            <Row>
-                <FilmTable films={props.films} />
-            </Row>
-        </>
-    );
-}
-
-export default ListOfFilms;
