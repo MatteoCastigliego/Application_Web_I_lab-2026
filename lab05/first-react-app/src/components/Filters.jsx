@@ -1,13 +1,21 @@
 import ListGroup from 'react-bootstrap/ListGroup';
 
-function Filters() {
+function Filters(props) {
+  const { activeFilter, onSelectFilter } = props;
+  const filters = ['All', 'Favourite', 'Best Rated', 'Seen Last Month', 'Unseen'];
+
   return (
     <ListGroup>
-      <ListGroup.Item>All</ListGroup.Item>
-      <ListGroup.Item>Favourite</ListGroup.Item>
-      <ListGroup.Item>Best Rated</ListGroup.Item>
-      <ListGroup.Item>Seen Last Month</ListGroup.Item>
-      <ListGroup.Item>Unseen</ListGroup.Item>
+      {filters.map(filter => (
+        <ListGroup.Item 
+          key={filter} 
+          active={activeFilter === filter}
+          onClick={() => onSelectFilter(filter)}
+          action 
+        >
+          {filter}
+        </ListGroup.Item>
+      ))}
     </ListGroup>
   );
 }

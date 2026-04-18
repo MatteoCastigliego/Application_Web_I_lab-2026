@@ -7,14 +7,15 @@ import Filters from './components/Filters.jsx';
 import ListOfFilms from './components/ListOfFilms.jsx';
 import { useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
+import dayjs from 'dayjs';
 
 function App() {
-  const film1 = new Film(1, "Mare Fuori", true, "10/03/2025", 4, 2);
-  const film2 = new Film(2, "Quo Vado?", true, "14/02/2019", 3, 1);
-  const film3 = new Film(3, "Suits", true, "16/12/2020", 5, 1);
-  const film4 = new Film(4, "Harry Potter", false,"25/05/1991", 3, 3);
-  const film5 = new Film(5, "Benvenuti al Sud", false, "11/01/1974", 3, 4);
-  const film6 = new Film(6, "Fast And Furious", true, "24/07/1975", 4, 2);
+  const film1 = new Film(1, "Mare Fuori", true, 4, "2025-03-10", 2);
+  const film2 = new Film(2, "Quo Vado?", true, 3, "2019-02-14", 1);
+  const film3 = new Film(3, "Suits", true, 5, "2020-12-16", 1);
+  const film4 = new Film(4, "Harry Potter", false, 3, "1991-05-25", 3);
+  const film5 = new Film(5, "Benvenuti al Sud", false, 3, "1974-01-11", 4);
+  const film6 = new Film(6, "Fast And Furious", true, 4, "1975-07-24", 2);
   
   const FilmsList = [];
   FilmsList.push(film1)
@@ -25,6 +26,20 @@ function App() {
   FilmsList.push(film6)
 
   const [film, setFilms] = useState(FilmsList)
+  const [activeFilter, setActiveFilter] = useState('All');
+
+  // Logica per calcolare dinamicamente i film da mostrare in base al filtro
+  const getFilteredFilms = () => {
+    switch(activeFilter) {
+      case 'Favourite': return film.filter(f => f.isFavorite);
+      case 'Best Rated': return film.filter(f => f.rating === 5);
+      case 'Seen Last Month':
+        const lastMonth = dayjs().subtract(30, 'day');
+        return film.filter(f => f.watchDate && f.watchDate.isAfter(lastMonth));
+      case 'Unseen': return film.filter(f => !f.watchDate);
+      default: return film; // 'All'
+    }
+  };
 
   return (
     <>
@@ -34,10 +49,10 @@ function App() {
       <Container fluid className="mt-3">
         <Row>
           <Col md={4}>
-            <Filters></Filters>
+            <Filters activeFilter={activeFilter} onSelectFilter={setActiveFilter} />
           </Col>
           <Col md={8}>
-            <ListOfFilms film = {film}></ListOfFilms>
+            <ListOfFilms films={getFilteredFilms()} activeFilter={activeFilter} />
           </Col>
         </Row>
       </Container>
