@@ -5,18 +5,21 @@ import { Film } from './models/FilmModels.js';
 import Header from './components/Header.jsx';
 import Filters from './components/Filters.jsx';
 import ListOfFilms from './components/ListOfFilms.jsx';
+import AddFilmButton from './components/AddFilmButton.jsx'
 import { useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import dayjs from 'dayjs';
+import './App.css';
 
 function App() {
-  const film1 = new Film(1, "Mare Fuori", true, 4, "2025-03-10", 2);
-  const film2 = new Film(2, "Quo Vado?", true, 3, "2019-02-14", 1);
-  const film3 = new Film(3, "Suits", true, 5, "2020-12-16", 1);
-  const film4 = new Film(4, "Harry Potter", false, 3, "1991-05-25", 3);
-  const film5 = new Film(5, "Benvenuti al Sud", false, 3, "1974-01-11", 4);
-  const film6 = new Film(6, "Fast And Furious", true, 4, "1975-07-24", 2);
-  
+  const id = -1
+  const film1 = new Film(id+1, "Mare Fuori", true, 4, "2025-03-10", 2);
+  const film2 = new Film(id+1, "Quo Vado?", true, 3, "2019-02-14", 1);
+  const film3 = new Film(id+1, "Suits", true, 5, "2020-12-16", 1);
+  const film4 = new Film(id+1, "Harry Potter", false, 3, "1991-05-25", 3);
+  const film5 = new Film(id+1, "Benvenuti al Sud", false, 3, "1974-01-11", 4);
+  const film6 = new Film(id+1, "Fast And Furious", true, 4, "1975-07-24", 2);
+
   const FilmsList = [];
   FilmsList.push(film1)
   FilmsList.push(film2)
@@ -28,9 +31,16 @@ function App() {
   const [film, setFilms] = useState(FilmsList)
   const [activeFilter, setActiveFilter] = useState('All');
 
+  // Funzione per aggiungere un nuovo film alla lista
+  const addFilm = (newFilmData) => {
+    const newId = Math.max(0, ...film.map(f => f.id)) + 1;
+    const newFilm = new Film(newId, newFilmData.title, newFilmData.isFavorite, newFilmData.rating, newFilmData.watchDate, 1);
+    setFilms((oldFilms) => [...oldFilms, newFilm]);
+  };
+
   // Logica per calcolare dinamicamente i film da mostrare in base al filtro
   const getFilteredFilms = () => {
-    switch(activeFilter) {
+    switch (activeFilter) {
       case 'Favourite': return film.filter(f => f.isFavorite);
       case 'Best Rated': return film.filter(f => f.rating === 5);
       case 'Seen Last Month':
@@ -44,7 +54,7 @@ function App() {
   return (
     <>
       <Header></Header>
-      
+
       {/* Griglia Bootstrap per il layout principale */}
       <Container fluid className="mt-3">
         <Row>
@@ -56,6 +66,7 @@ function App() {
           </Col>
         </Row>
       </Container>
+      <AddFilmButton addFilm={addFilm} />
     </>
   )
 }
