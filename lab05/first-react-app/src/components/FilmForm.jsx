@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
+import dayjs from 'dayjs';
 
 function FilmForm(props) {
-  const [validated, setValidated] = useState(false);
-  
   // states for form
   const [title, setTitle] = useState('');
   const [watchDate, setWatchDate] = useState('');
   const [rating, setRating] = useState('');
   const [isFavorite, setIsFavorite] = useState(false);
+
+  const [errors, setErrors] = useState({});
 
   /* if the film is present (modify mode) we take present parameters
      if not ProgressEvent, we are creating a new one so in the form anything is showed */
@@ -24,15 +25,27 @@ function FilmForm(props) {
       setRating('');
       setIsFavorite(false);
     }
+    // Resetta gli errori quando il film cambia (es. chiudendo e riaprendo la modale)
+    setErrors({});
   }, [props.film]);
 
+  const validateForm = () => {
+    const newErrors = {};
+    if (!title || title.trim() === '') {
+      newErrors.title = "Title is mandatory and can't contain only spaces.";
+    }
+    if (watchDate && dayjs(watchDate).isAfter(dayjs())) {
+      newErrors.watchDate = "Watch date can't be in the future.";
+    }
+    return newErrors;
+  };
+
   const handleSubmit = (event) => {
-    const form = event.currentTarget;
-    if (form.checkValidity() === false) {
-      event.preventDefault();
-      event.stopPropagation();
-    } else {
-      event.preventDefault();
+    event.preventDefault();
+    const formErrors = validateForm();
+
+    if (Object.keys(formErrors).length === 0) {
+      // No errors, save it
       // Take datas and then call the function
       const newFilm = {
         title: title,
@@ -41,13 +54,14 @@ function FilmForm(props) {
         isFavorite: isFavorite
       };
       props.onSave(newFilm);
+    } else {
+      // there are errors
+      setErrors(formErrors);
     }
-
-    setValidated(true);
   };
 
   return (
-    <Form noValidate validated={validated} onSubmit={handleSubmit}>
+    <Form noValidate onSubmit={handleSubmit}>
       <Row className="mb-3">
         <Form.Group as={Col} md="6" controlId="validationCustom01">
           <Form.Label>Title</Form.Label>
@@ -57,8 +71,11 @@ function FilmForm(props) {
             placeholder="Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            isInvalid={!!errors.title}
           />
-          <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
+          <Form.Control.Feedback type="invalid">
+            {errors.title}
+          </Form.Control.Feedback>
         </Form.Group>
         <Form.Group as={Col} md="6" controlId="validationCustom02">
           <Form.Label>Watch Date</Form.Label>
@@ -66,7 +83,11 @@ function FilmForm(props) {
             type="date"
             value={watchDate}
             onChange={(e) => setWatchDate(e.target.value)}
+            isInvalid={!!errors.watchDate}
           />
+          <Form.Control.Feedback type="invalid">
+            {errors.watchDate}
+          </Form.Control.Feedback>
         </Form.Group>
       </Row>
       <Row className="mb-3">
