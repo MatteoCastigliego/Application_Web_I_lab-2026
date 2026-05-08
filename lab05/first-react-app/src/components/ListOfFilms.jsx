@@ -1,6 +1,8 @@
-import { Row, Col, Table, Button } from 'react-bootstrap';
-import { Trash, StarFill, Star, HeartFill, Heart } from 'react-bootstrap-icons';
-import EditFilmButton from './EditFilmButton.jsx';
+import { Row, Col, Table, Button, Modal } from 'react-bootstrap';
+import { Trash, StarFill, Star, HeartFill, Heart, Pencil } from 'react-bootstrap-icons';
+import { useState } from 'react';
+import FilmForm from './FilmForm.jsx';
+import { Film } from '../models/FilmModels.js';
 
 
 function ListOfFilms(props) {
@@ -15,11 +17,6 @@ function ListOfFilms(props) {
         </>
     );
 }
-
-export default ListOfFilms;
-
-
-
 
 function FilmTable(props) {
     const films = props.films;
@@ -74,3 +71,43 @@ function FilmActionButtons(props) {
         </td>
     );
 }
+
+
+function EditFilmButton(props) {
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  const handleSave = (filmData) => {
+    const updatedFilm = new Film(
+      props.film.id,
+      filmData.title,
+      filmData.isFavorite,
+      filmData.rating,
+      filmData.watchDate,
+      props.film.userId
+    );
+    props.updateFilm(updatedFilm);
+    handleClose();
+  };
+
+  return (
+    <>
+      <Button variant='warning' className='me-2' onClick={handleShow}>
+        <Pencil />
+      </Button>
+
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Film</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <FilmForm film={props.film} onSave={handleSave} handleClose={handleClose} />
+        </Modal.Body>
+      </Modal>
+    </>
+  );
+}
+
+export default ListOfFilms;
