@@ -1,5 +1,6 @@
 import { Row, Col, Table, Button } from 'react-bootstrap';
-import { Pencil, Trash, StarFill, Star, HeartFill, Heart } from 'react-bootstrap-icons';
+import { Trash, StarFill, Star, HeartFill, Heart } from 'react-bootstrap-icons';
+import EditFilmButton from './EditFilmButton.jsx';
 
 
 function ListOfFilms(props) {
@@ -9,7 +10,7 @@ function ListOfFilms(props) {
                 <Col as='h2' className='text-start'>Filter: {props.activeFilter}</Col>
             </Row>
             <Row>
-                <FilmTable films={props.films} />
+                <FilmTable films={props.films} updateFilm={props.updateFilm} />
             </Row>
         </>
     );
@@ -35,7 +36,7 @@ function FilmTable(props) {
                 </tr>
             </thead>
             <tbody>
-                {films.map((f) => <FilmRow film={f} />)}
+                {films.map((f) => <FilmRow key={f.id} film={f} updateFilm={props.updateFilm} />)}
             </tbody>
         </Table>
     );
@@ -60,7 +61,7 @@ function FilmRow(props) {
             <td>{f.isFavorite ? <HeartFill color="red" /> : <Heart />}</td>
             <td>{f.watchDate ? f.watchDate.format('YYYY-MM-DD') : ''}</td>
             <td>{renderStars(f.rating)}</td>
-            <FilmActionButtons film={f} />
+            <FilmActionButtons film={f} updateFilm={props.updateFilm} />
         </tr>
     );
 }
@@ -68,9 +69,8 @@ function FilmRow(props) {
 function FilmActionButtons(props) {
     return (
         <td>
-            <Button variant='warning' className='me-2'><Pencil /></Button>
+            <EditFilmButton film={props.film} updateFilm={props.updateFilm} />
             <Button variant='danger'><Trash /></Button>
         </td>
     );
 }
-

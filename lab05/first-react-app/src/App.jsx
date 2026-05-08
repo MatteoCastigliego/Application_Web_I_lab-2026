@@ -12,13 +12,12 @@ import dayjs from 'dayjs';
 import './App.css';
 
 function App() {
-  const id = -1
-  const film1 = new Film(id+1, "Mare Fuori", true, 4, "2025-03-10", 2);
-  const film2 = new Film(id+1, "Quo Vado?", true, 3, "2019-02-14", 1);
-  const film3 = new Film(id+1, "Suits", true, 5, "2020-12-16", 1);
-  const film4 = new Film(id+1, "Harry Potter", false, 3, "1991-05-25", 3);
-  const film5 = new Film(id+1, "Benvenuti al Sud", false, 3, "1974-01-11", 4);
-  const film6 = new Film(id+1, "Fast And Furious", true, 4, "1975-07-24", 2);
+  const film1 = new Film(1, "Mare Fuori", true, 4, "2025-03-10", 2);
+  const film2 = new Film(2, "Quo Vado?", true, 3, "2019-02-14", 1);
+  const film3 = new Film(3, "Suits", true, 5, "2020-12-16", 1);
+  const film4 = new Film(4, "Harry Potter", false, 3, "1991-05-25", 3);
+  const film5 = new Film(5, "Benvenuti al Sud", false, 3, "1974-01-11", 4);
+  const film6 = new Film(6, "Fast And Furious", true, 4, "1975-07-24", 2);
 
   const FilmsList = [];
   FilmsList.push(film1)
@@ -36,6 +35,11 @@ function App() {
     const newId = Math.max(0, ...film.map(f => f.id)) + 1;
     const newFilm = new Film(newId, newFilmData.title, newFilmData.isFavorite, newFilmData.rating, newFilmData.watchDate, 1);
     setFilms((oldFilms) => [...oldFilms, newFilm]);
+  };
+
+  // Funzione per aggiornare un film esistente
+  const updateFilm = (updatedFilm) => {
+    setFilms((oldFilms) => oldFilms.map(f => f.id === updatedFilm.id ? updatedFilm : f));
   };
 
   // Logica per calcolare dinamicamente i film da mostrare in base al filtro
@@ -62,10 +66,11 @@ function App() {
             <Filters activeFilter={activeFilter} onSelectFilter={setActiveFilter} />
           </Col>
           <Col md={8}>
-            <ListOfFilms films={getFilteredFilms()} activeFilter={activeFilter} />
+            <ListOfFilms films={getFilteredFilms()} activeFilter={activeFilter} updateFilm={updateFilm} />
           </Col>
         </Row>
       </Container>
+
       <AddFilmButton addFilm={addFilm} />
     </>
   )

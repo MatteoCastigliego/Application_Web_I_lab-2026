@@ -20,7 +20,7 @@ function AddFilmButton(props) {
           <Modal.Title>Add New Film</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <FilmForm addFilm={props.addFilm} handleClose={handleClose} />
+          <FilmForm onSave={(film) => { props.addFilm(film); handleClose(); }} handleClose={handleClose} />
         </Modal.Body>
       </Modal>
     </>

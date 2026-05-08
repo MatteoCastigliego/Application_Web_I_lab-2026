@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 
 function FilmForm(props) {
@@ -10,6 +10,22 @@ function FilmForm(props) {
   const [rating, setRating] = useState('');
   const [isFavorite, setIsFavorite] = useState(false);
 
+  /* if the film is present (modify mode) we take present parameters
+     if not ProgressEvent, we are creating a new one so in the form anything is showed */
+  useEffect(() => {
+    if (props.film) {
+      setTitle(props.film.title);
+      setWatchDate(props.film.watchDate ? props.film.watchDate.format('YYYY-MM-DD') : '');
+      setRating(props.film.rating || '');
+      setIsFavorite(props.film.isFavorite);
+    } else {
+      setTitle('');
+      setWatchDate('');
+      setRating('');
+      setIsFavorite(false);
+    }
+  }, [props.film]);
+
   const handleSubmit = (event) => {
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
@@ -20,12 +36,11 @@ function FilmForm(props) {
       // Take datas and then call the function
       const newFilm = {
         title: title,
-        watchDate: watchDate || null, // If empty => null
+        watchDate: watchDate || null,
         rating: rating ? parseInt(rating) : 0,
         isFavorite: isFavorite
       };
-      props.addFilm(newFilm);
-      props.handleClose(); // close modal
+      props.onSave(newFilm);
     }
 
     setValidated(true);
