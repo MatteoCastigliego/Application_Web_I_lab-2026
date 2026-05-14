@@ -1,10 +1,15 @@
 import { Button, Container, Form, Nav, Navbar, NavDropdown } from 'react-bootstrap';
+import { Link, useLocation } from 'react-router-dom';
+
+{/* The hook useLocation is useful to make disappear a button when a condition is true */}
 
 function Header() {
+  const location = useLocation();
+
   return (
     <Navbar expand="lg" className="bg-body-tertiary">
       <Container fluid>
-        <Navbar.Brand href="#">Film Library</Navbar.Brand>
+        <Navbar.Brand as={Link} to="/">Film Library</Navbar.Brand>
         <Navbar.Toggle aria-controls="navbarScroll" />
         <Navbar.Collapse id="navbarScroll">
           <Nav
@@ -22,6 +27,11 @@ function Header() {
             />
             <Button variant="outline-success">Search</Button>
           </Form>
+        {location.pathname !== '/login' && (
+          <Button as={Link} to="/login" variant="outline-success" className="ms-3">
+            Login
+          </Button>
+        )}
         </Navbar.Collapse>
       </Container>
     </Navbar>

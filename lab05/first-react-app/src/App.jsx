@@ -6,10 +6,12 @@ import Header from './components/Header.jsx';
 import Filters from './components/Filters.jsx';
 import ListOfFilms from './components/ListOfFilms.jsx';
 import AddFilmButton from './components/AddFilmButton.jsx'
+import LoginPage from './components/LoginPage.jsx';
 import { useState } from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 import dayjs from 'dayjs';
 import './App.css';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useParams, Link } from 'react-router-dom';
 
 function App() {
   const film1 = new Film(1, "Mare Fuori", true, 4, "2025-03-10", 2);
@@ -28,7 +30,6 @@ function App() {
   FilmsList.push(film6)
 
   const [film, setFilms] = useState(FilmsList)
-  const [activeFilter, setActiveFilter] = useState('All');
 
   // Funzione per aggiungere un nuovo film alla lista
   const addFilm = (newFilmData) => {
@@ -42,38 +43,107 @@ function App() {
     setFilms((oldFilms) => oldFilms.map(f => f.id === updatedFilm.id ? updatedFilm : f));
   };
 
-  // Logica per calcolare dinamicamente i film da mostrare in base al filtro
+  // Punto 2: Funzione per eliminare un film (da usare nei bottoni in riga)
+  const deleteFilm = (filmId) => {
+    setFilms((oldFilms) => oldFilms.filter(f => f.id !== filmId));
+  };
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route element={<MainLayout />}> {/* main layout */}
+          
+          {/* Routes for different pages */}
+          <Route path="/login" element={<LoginPage />} />
+          {/* Rotta per gestire tutti gli URL inesistenti (404 Not Found) */}
+          <Route path="*" element={<NotFoundPage />} />
+
+          <Route element={<FiltersLayout />}>
+            {/* Each filter has a different layout */}
+            <Route path="/" element={<Navigate to="/filter/All" replace />} />
+            
+            <Route path="/filter/:filterId" element={
+              <FilmListRoute 
+                films={film} 
+                updateFilm={updateFilm} 
+                deleteFilm={deleteFilm} 
+                addFilm={addFilm} 
+              />
+            } />
+          </Route>
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  )
+}
+
+function MainLayout() {
+  return (
+    <>
+      <Header />
+      <div style={{ minHeight: '80vh' }}>
+        <Outlet />
+      </div>
+      <footer className="text-center py-4 text-muted bg-light mt-auto">
+        <small>&copy; 2024 Film Library Application</small>
+      </footer>
+    </>
+  );
+}
+
+function FiltersLayout() {
+  return (
+      <Container fluid className="mt-3">
+        <Row>
+          <Col md={4}>
+            <Filters />
+          </Col>
+          <Col md={8}>
+            <Outlet />
+          </Col>
+        </Row>
+      </Container>
+  );
+}
+
+function FilmListRoute({ films, updateFilm, deleteFilm, addFilm }) {
+  const { filterId } = useParams();
+
   const getFilteredFilms = () => {
-    switch (activeFilter) {
-      case 'Favourite': return film.filter(f => f.isFavorite);
-      case 'Best Rated': return film.filter(f => f.rating === 5);
+    switch (filterId) {
+      case 'Favourite': return films.filter(f => f.isFavorite);
+      case 'Best Rated': return films.filter(f => f.rating === 5);
       case 'Seen Last Month':
         const lastMonth = dayjs().subtract(30, 'day');
-        return film.filter(f => f.watchDate && f.watchDate.isAfter(lastMonth));
-      case 'Unseen': return film.filter(f => !f.watchDate);
-      default: return film; // 'All'
+        return films.filter(f => f.watchDate && dayjs(f.watchDate).isAfter(lastMonth));
+      case 'Unseen': return films.filter(f => !f.watchDate);
+      default: return films; // 'All'
     }
   };
 
   return (
     <>
-      <Header></Header>
-
-      {/* Griglia Bootstrap per il layout principale */}
-      <Container fluid className="mt-3">
-        <Row>
-          <Col md={4}>
-            <Filters activeFilter={activeFilter} onSelectFilter={setActiveFilter} />
-          </Col>
-          <Col md={8}>
-            <ListOfFilms films={getFilteredFilms()} activeFilter={activeFilter} updateFilm={updateFilm} />
-          </Col>
-        </Row>
-      </Container>
-
-      <AddFilmButton addFilm={addFilm} />
+      <ListOfFilms 
+        films={getFilteredFilms()} 
+        activeFilter={filterId} 
+        updateFilm={updateFilm} 
+        deleteFilm={deleteFilm}
+      />
+      {/* The button for adding a film is placed here because the section of filter is defined as homepage of the website */}
+      <AddFilmButton addFilm={addFilm} /> 
     </>
-  )
+  );
+}
+
+function NotFoundPage() {
+  return (
+    <Container className="mt-5 text-center">
+      <h1 className="display-1 text-danger">404</h1>
+      <h2>Page not fount!</h2>
+      <p className="lead">Inserted URL doesn't exist or is wrong</p>
+      <Button as={Link} to="/" variant="primary" className="mt-3">Go Home</Button>
+    </Container>
+  );
 }
 
 export default App
