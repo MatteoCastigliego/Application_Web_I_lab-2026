@@ -12,7 +12,7 @@ function ListOfFilms(props) {
                 <Col as='h2' className='text-start'>Filter: {props.activeFilter}</Col>
             </Row>
             <Row>
-                <FilmTable films={props.films} updateFilm={props.updateFilm} />
+                <FilmTable films={props.films} updateFilm={props.updateFilm} deleteFilm={props.deleteFilm} />
             </Row>
         </>
     );
@@ -33,7 +33,7 @@ function FilmTable(props) {
                 </tr>
             </thead>
             <tbody>
-                {films.map((f) => <FilmRow key={f.id} film={f} updateFilm={props.updateFilm} />)}
+                {films.map((f) => <FilmRow key={f.id} film={f} updateFilm={props.updateFilm} deleteFilm={props.deleteFilm} />)}
             </tbody>
         </Table>
     );
@@ -42,12 +42,24 @@ function FilmTable(props) {
 function FilmRow(props) {
     const f = props.film;
 
+    // Funzione per invertire lo stato di "preferito"
+    const toggleFavorite = () => {
+        const updatedFilm = new Film(f.id, f.title, !f.isFavorite, f.rating, f.watchDate, f.userId);
+        props.updateFilm(updatedFilm);
+    };
+
+    // Funzione per aggiornare il punteggio (rating)
+    const updateRating = (newRating) => {
+        const updatedFilm = new Film(f.id, f.title, f.isFavorite, newRating, f.watchDate, f.userId);
+        props.updateFilm(updatedFilm);
+    };
+
     // Funzione helper per renderizzare le stelline piene/vuote
     const renderStars = (rating) => {
         const stars = [];
         for (let i = 0; i < 5; i++) {
-            if (rating && i < rating) stars.push(<StarFill key={i} />);
-            else stars.push(<Star key={i} />);
+            if (rating && i < rating) stars.push(<StarFill key={i} onClick={() => updateRating(i + 1)} style={{ cursor: 'pointer' }} />);
+            else stars.push(<Star key={i} onClick={() => updateRating(i + 1)} style={{ cursor: 'pointer' }} />);
         }
         return stars;
     };
@@ -55,10 +67,12 @@ function FilmRow(props) {
     return (
         <tr>
             <td>{f.title}</td>
-            <td>{f.isFavorite ? <HeartFill color="red" /> : <Heart />}</td>
+            <td onClick={toggleFavorite} style={{ cursor: 'pointer' }}>
+                {f.isFavorite ? <HeartFill color="red" /> : <Heart />}
+            </td>
             <td>{f.watchDate ? f.watchDate.format('YYYY-MM-DD') : ''}</td>
             <td>{renderStars(f.rating)}</td>
-            <FilmActionButtons film={f} updateFilm={props.updateFilm} />
+            <FilmActionButtons film={f} updateFilm={props.updateFilm} deleteFilm={props.deleteFilm} />
         </tr>
     );
 }
@@ -67,7 +81,7 @@ function FilmActionButtons(props) {
     return (
         <td>
             <EditFilmButton film={props.film} updateFilm={props.updateFilm} />
-            <Button variant='danger'><Trash /></Button>
+            <DeleteFilmButton film={props.film} deleteFilm={props.deleteFilm} />
         </td>
     );
 }
@@ -108,6 +122,14 @@ function EditFilmButton(props) {
       </Modal>
     </>
   );
+}
+
+function DeleteFilmButton(props){
+    return (
+        <Button variant='danger' className='me-2' onClick={() => props.deleteFilm(props.film.id)}>
+        <Trash />
+      </Button>
+    )
 }
 
 export default ListOfFilms;
