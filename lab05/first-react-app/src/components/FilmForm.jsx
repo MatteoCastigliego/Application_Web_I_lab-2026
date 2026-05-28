@@ -3,16 +3,12 @@ import { Button, Col, Form, Row } from 'react-bootstrap';
 import dayjs from 'dayjs';
 
 function FilmForm(props) {
-  // states for form
-  const [title, setTitle] = useState('');
+  const [title, setTitle]         = useState('');
   const [watchDate, setWatchDate] = useState('');
-  const [rating, setRating] = useState('');
+  const [rating, setRating]       = useState('');
   const [isFavorite, setIsFavorite] = useState(false);
+  const [errors, setErrors]       = useState({});
 
-  const [errors, setErrors] = useState({});
-
-  /* if the film is present (modify mode) we take present parameters
-     if not ProgressEvent, we are creating a new one so in the form anything is showed */
   useEffect(() => {
     if (props.film) {
       setTitle(props.film.title);
@@ -20,96 +16,82 @@ function FilmForm(props) {
       setRating(props.film.rating || '');
       setIsFavorite(props.film.isFavorite);
     } else {
-      setTitle('');
-      setWatchDate('');
-      setRating('');
-      setIsFavorite(false);
+      setTitle(''); setWatchDate(''); setRating(''); setIsFavorite(false);
     }
-    // Resetta gli errori quando il film cambia (es. chiudendo e riaprendo la modale)
     setErrors({});
   }, [props.film]);
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!title || title.trim() === '') {
-      newErrors.title = "Title is mandatory and can't contain only spaces.";
-    }
-    if (watchDate && dayjs(watchDate).isAfter(dayjs())) {
-      newErrors.watchDate = "Watch date can't be in the future.";
-    }
-    return newErrors;
+  const validate = () => {
+    const errs = {};
+    if (!title || title.trim() === '') errs.title = "Il titolo è obbligatorio.";
+    if (watchDate && dayjs(watchDate).isAfter(dayjs())) errs.watchDate = "La data non può essere nel futuro.";
+    return errs;
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const formErrors = validateForm();
-
-    if (Object.keys(formErrors).length === 0) {
-      // No errors, save it
-      // Take datas and then call the function
-      const newFilm = {
-        title: title,
-        watchDate: watchDate || null,
-        rating: rating ? parseInt(rating) : 0,
-        isFavorite: isFavorite
-      };
-      props.onSave(newFilm);
-    } else {
-      // there are errors
-      setErrors(formErrors);
-    }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const errs = validate();
+    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+    props.onSave({
+      title,
+      watchDate: watchDate || null,
+      rating: rating ? parseInt(rating) : null,
+      isFavorite,
+    });
   };
 
   return (
     <Form noValidate onSubmit={handleSubmit}>
+      <Form.Group className="mb-3">
+        <Form.Label>Titolo</Form.Label>
+        <Form.Control
+          type="text"
+          placeholder="es. Inception"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          isInvalid={!!errors.title}
+          autoFocus
+        />
+        <Form.Control.Feedback type="invalid">{errors.title}</Form.Control.Feedback>
+      </Form.Group>
+
       <Row className="mb-3">
-        <Form.Group as={Col} md="6" controlId="validationCustom01">
-          <Form.Label>Title</Form.Label>
-          <Form.Control
-            required
-            type="text"
-            placeholder="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            isInvalid={!!errors.title}
-          />
-          <Form.Control.Feedback type="invalid">
-            {errors.title}
-          </Form.Control.Feedback>
-        </Form.Group>
-        <Form.Group as={Col} md="6" controlId="validationCustom02">
-          <Form.Label>Watch Date</Form.Label>
+        <Form.Group as={Col} sm={6}>
+          <Form.Label>Data visione</Form.Label>
           <Form.Control
             type="date"
             value={watchDate}
             onChange={(e) => setWatchDate(e.target.value)}
             isInvalid={!!errors.watchDate}
           />
-          <Form.Control.Feedback type="invalid">
-            {errors.watchDate}
-          </Form.Control.Feedback>
+          <Form.Control.Feedback type="invalid">{errors.watchDate}</Form.Control.Feedback>
         </Form.Group>
-      </Row>
-      <Row className="mb-3">
-        <Form.Group as={Col} md="6" controlId="validationCustom03">
-          <Form.Label>Rating (0-5)</Form.Label>
-          <Form.Control 
-            type="number" 
-            min="0" max="5" 
+        <Form.Group as={Col} sm={6}>
+          <Form.Label>Valutazione (1–5)</Form.Label>
+          <Form.Control
+            type="number"
+            min="1"
+            max="5"
+            placeholder="—"
             value={rating}
             onChange={(e) => setRating(e.target.value)}
           />
-          <Form.Control.Feedback type="invalid">
-            Please provide a valid rating between 0 and 5.
-          </Form.Control.Feedback>
         </Form.Group>
       </Row>
-      <Form.Group className="mb-3">
-        <Form.Check label="Favourite" checked={isFavorite} onChange={(e) => setIsFavorite(e.target.checked)} />
+
+      <Form.Group className="mb-4">
+        <Form.Check
+          type="switch"
+          id="favorite-switch"
+          label="Segna come preferito ❤️"
+          checked={isFavorite}
+          onChange={(e) => setIsFavorite(e.target.checked)}
+        />
       </Form.Group>
-      <div className="d-flex justify-content-end">
-        <Button variant="secondary" className="me-2" onClick={props.handleClose}>Close</Button>
-        <Button type="submit" variant="primary">Save Changes</Button>
+
+      <div className="d-flex justify-content-end gap-2">
+        <Button variant="secondary" onClick={props.handleClose}>Annulla</Button>
+        <Button type="submit" variant="primary">💾 Salva</Button>
       </div>
     </Form>
   );

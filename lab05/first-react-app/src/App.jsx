@@ -1,91 +1,122 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-// Puoi rimuovere l'import di App.css se contiene ancora gli stili di default di Vite
+import './App.css';
+
+import { useState, useEffect } from 'react';
+import { Container, Row, Col, Button } from 'react-bootstrap';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useParams, Link, useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
 
 import { Film } from './models/FilmModels.js';
 import Header from './components/Header.jsx';
 import Filters from './components/Filters.jsx';
 import ListOfFilms from './components/ListOfFilms.jsx';
-import AddFilmButton from './components/AddFilmButton.jsx'
+import AddFilmButton from './components/AddFilmButton.jsx';
 import LoginPage from './components/LoginPage.jsx';
-import { useState } from 'react';
-import { Container, Row, Col, Button } from 'react-bootstrap';
-import dayjs from 'dayjs';
-import './App.css';
-import { BrowserRouter, Routes, Route, Navigate, Outlet, useParams, Link } from 'react-router-dom';
+import UserContext from './contexts/UserContext.js';
+
+import { getFilms, addFilm, updateFilm, deleteFilm } from './api/api.js';
+import { checkSession } from './api/auth.js';
 
 function App() {
-  const film1 = new Film(1, "Mare Fuori", true, 4, "2025-03-10", 2);
-  const film2 = new Film(2, "Quo Vado?", true, 3, "2019-02-14", 1);
-  const film3 = new Film(3, "Suits", true, 5, "2020-12-16", 1);
-  const film4 = new Film(4, "Harry Potter", false, 3, "1991-05-25", 3);
-  const film5 = new Film(5, "Benvenuti al Sud", false, 3, "1974-01-11", 4);
-  const film6 = new Film(6, "Fast And Furious", true, 4, "1975-07-24", 2);
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
+  );
+}
 
-  const FilmsList = [];
-  FilmsList.push(film1)
-  FilmsList.push(film2)
-  FilmsList.push(film3)
-  FilmsList.push(film4)
-  FilmsList.push(film5)
-  FilmsList.push(film6)
+function AppContent() {
+  const navigate = useNavigate();
 
-  const [film, setFilms] = useState(FilmsList)
+  // --- USER STATE ---
+  const [user, setUser] = useState({ id: undefined, email: undefined, name: undefined });
 
-  // Funzione per aggiungere un nuovo film alla lista
-  const addFilm = (newFilmData) => {
-    const newId = Math.max(0, ...film.map(f => f.id)) + 1;
-    const newFilm = new Film(newId, newFilmData.title, newFilmData.isFavorite, newFilmData.rating, newFilmData.watchDate, 1);
-    setFilms((oldFilms) => [...oldFilms, newFilm]);
+  // Ripristina la sessione al caricamento
+  useEffect(() => {
+    checkSession().then((result) => {
+      if (result) setUser({ id: result.id, email: result.username, name: result.name });
+    });
+  }, []);
+
+  const doLogin = (newUser) => {
+    setUser({ id: newUser.id, email: newUser.username, name: newUser.name });
+    navigate('/filter/All');
   };
 
-  // Funzione per aggiornare un film esistente
-  const updateFilm = (updatedFilm) => {
-    setFilms((oldFilms) => oldFilms.map(f => f.id === updatedFilm.id ? updatedFilm : f));
+  const doLogout = () => {
+    setUser({ id: undefined, email: undefined, name: undefined });
+    setFilms([]);
+    navigate('/login');
   };
 
-  // Punto 2: Funzione per eliminare un film (da usare nei bottoni in riga)
-  const deleteFilm = (filmId) => {
-    setFilms((oldFilms) => oldFilms.filter(f => f.id !== filmId));
+  // --- FILMS STATE ---
+  const [films, setFilms] = useState([]);
+
+  // Carica i film dal server quando l'utente si logga
+  useEffect(() => {
+    if (!user.id) return;
+    getFilms()
+      .then((list) => setFilms(list))
+      .catch(() => navigate('/login'));
+  }, [user.id]);
+
+  // Aggiunge un film
+  const handleAddFilm = async (newFilmData) => {
+    const { id } = await addFilm({ ...newFilmData, userId: user.id });
+    const newFilm = new Film(id, newFilmData.title, newFilmData.isFavorite, newFilmData.rating, newFilmData.watchDate, user.id);
+    setFilms((old) => [...old, newFilm]);
+  };
+
+  // Aggiorna un film
+  const handleUpdateFilm = async (updatedFilm) => {
+    await updateFilm(updatedFilm);
+    setFilms((old) => old.map((f) => (f.id === updatedFilm.id ? updatedFilm : f)));
+  };
+
+  // Elimina un film
+  const handleDeleteFilm = async (filmId) => {
+    await deleteFilm(filmId);
+    setFilms((old) => old.filter((f) => f.id !== filmId));
   };
 
   return (
-    <BrowserRouter>
+    <UserContext.Provider value={user}>
       <Routes>
-        <Route element={<MainLayout />}> {/* main layout */}
-          
-          {/* Routes for different pages */}
-          <Route path="/login" element={<LoginPage />} />
-          {/* Rotta per gestire tutti gli URL inesistenti (404 Not Found) */}
+        <Route element={<MainLayout doLogout={doLogout} />}>
+
+          <Route path="/login" element={
+            user.id ? <Navigate to="/filter/All" replace /> : <LoginPage doLogin={doLogin} />
+          } />
+
           <Route path="*" element={<NotFoundPage />} />
 
-          <Route element={<FiltersLayout />}>
-            {/* Each filter has a different layout */}
+          <Route element={user.id ? <FiltersLayout /> : <Navigate to="/login" replace />}>
             <Route path="/" element={<Navigate to="/filter/All" replace />} />
-            
             <Route path="/filter/:filterId" element={
-              <FilmListRoute 
-                films={film} 
-                updateFilm={updateFilm} 
-                deleteFilm={deleteFilm} 
-                addFilm={addFilm} 
+              <FilmListRoute
+                films={films}
+                updateFilm={handleUpdateFilm}
+                deleteFilm={handleDeleteFilm}
+                addFilm={handleAddFilm}
               />
             } />
           </Route>
+
         </Route>
       </Routes>
-    </BrowserRouter>
-  )
+    </UserContext.Provider>
+  );
 }
 
-function MainLayout() {
+function MainLayout({ doLogout }) {
   return (
     <>
-      <Header />
-      <div style={{ minHeight: '80vh' }}>
+      <Header doLogout={doLogout} />
+      <div style={{ flex: 1 }}>
         <Outlet />
       </div>
-      <footer className="text-center py-4 text-muted bg-light mt-auto">
-        <small>&copy; 2024 Film Library Application</small>
+      <footer className="app-footer">
+        🎬 Film Library &nbsp;·&nbsp; Web Applications I &nbsp;·&nbsp; {new Date().getFullYear()}
       </footer>
     </>
   );
@@ -93,16 +124,16 @@ function MainLayout() {
 
 function FiltersLayout() {
   return (
-      <Container fluid className="mt-3">
-        <Row>
-          <Col md={4}>
-            <Filters />
-          </Col>
-          <Col md={8}>
-            <Outlet />
-          </Col>
-        </Row>
-      </Container>
+    <Container fluid className="mt-4 px-4">
+      <Row>
+        <Col md={3} lg={2}>
+          <Filters />
+        </Col>
+        <Col md={9} lg={10}>
+          <Outlet />
+        </Col>
+      </Row>
+    </Container>
   );
 }
 
@@ -111,39 +142,41 @@ function FilmListRoute({ films, updateFilm, deleteFilm, addFilm }) {
 
   const getFilteredFilms = () => {
     switch (filterId) {
-      case 'Favourite': return films.filter(f => f.isFavorite);
-      case 'Best Rated': return films.filter(f => f.rating === 5);
-      case 'Seen Last Month':
+      case 'Favourite': return films.filter((f) => f.isFavorite);
+      case 'Best Rated': return films.filter((f) => f.rating === 5);
+      case 'Seen Last Month': {
         const lastMonth = dayjs().subtract(30, 'day');
-        return films.filter(f => f.watchDate && dayjs(f.watchDate).isAfter(lastMonth));
-      case 'Unseen': return films.filter(f => !f.watchDate);
-      default: return films; // 'All'
+        return films.filter((f) => f.watchDate && dayjs(f.watchDate).isAfter(lastMonth));
+      }
+      case 'Unseen': return films.filter((f) => !f.watchDate);
+      default: return films;
     }
   };
 
   return (
     <>
-      <ListOfFilms 
-        films={getFilteredFilms()} 
-        activeFilter={filterId} 
-        updateFilm={updateFilm} 
+      <ListOfFilms
+        films={getFilteredFilms()}
+        activeFilter={filterId}
+        updateFilm={updateFilm}
         deleteFilm={deleteFilm}
       />
-      {/* The button for adding a film is placed here because the section of filter is defined as homepage of the website */}
-      <AddFilmButton addFilm={addFilm} /> 
+      <AddFilmButton addFilm={addFilm} />
     </>
   );
 }
 
 function NotFoundPage() {
   return (
-    <Container className="mt-5 text-center">
-      <h1 className="display-1 text-danger">404</h1>
-      <h2>Page not fount!</h2>
-      <p className="lead">Inserted URL doesn't exist or is wrong</p>
-      <Button as={Link} to="/" variant="primary" className="mt-3">Go Home</Button>
-    </Container>
+    <div className="not-found-page">
+      <div className="not-found-number">404</div>
+      <h2 style={{ marginBottom: '0.5rem' }}>Pagina non trovata</h2>
+      <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
+        L'URL inserito non esiste o non è corretto.
+      </p>
+      <Button as={Link} to="/" variant="primary">🏠 Torna alla home</Button>
+    </div>
   );
 }
 
-export default App
+export default App;

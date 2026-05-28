@@ -1,135 +1,136 @@
-import { Row, Col, Table, Button, Modal } from 'react-bootstrap';
+import { Table, Button, Modal } from 'react-bootstrap';
 import { Trash, StarFill, Star, HeartFill, Heart, Pencil } from 'react-bootstrap-icons';
 import { useState } from 'react';
 import FilmForm from './FilmForm.jsx';
 import { Film } from '../models/FilmModels.js';
 
+const FILTER_ICONS = {
+  'All': '🎬',
+  'Favourite': '❤️',
+  'Best Rated': '⭐',
+  'Seen Last Month': '🕐',
+  'Unseen': '👁️',
+};
 
 function ListOfFilms(props) {
-    return (
-        <>
-            <Row>
-                <Col as='h2' className='text-start'>Filter: {props.activeFilter}</Col>
-            </Row>
-            <Row>
-                <FilmTable films={props.films} updateFilm={props.updateFilm} deleteFilm={props.deleteFilm} />
-            </Row>
-        </>
-    );
+  return (
+    <div className="fade-in bg-white p-4 rounded-4 shadow-sm mb-5">
+      <h2 className="filter-title fw-bold mb-4 d-flex align-items-center gap-3">
+        <span className="bg-primary bg-opacity-10 text-primary rounded-circle p-2 fs-3 d-flex align-items-center justify-content-center" style={{width: '50px', height: '50px'}}>{FILTER_ICONS[props.activeFilter] || '🎬'}</span>
+        {props.activeFilter}
+        <span className="badge bg-secondary rounded-pill fs-6 opacity-75">
+          {props.films.length}
+        </span>
+      </h2>
+
+      {props.films.length === 0 ? (
+        <div className="d-flex flex-column align-items-center justify-content-center p-5 border border-2 border-dashed rounded-4 bg-light text-muted mt-3">
+          <div style={{ fontSize: '4rem', opacity: 0.5, filter: 'grayscale(100%)' }}>📭</div>
+          <h5 className="mt-3 fw-normal">Nessun film in questa categoria.</h5>
+        </div>
+      ) : (
+        <FilmTable films={props.films} updateFilm={props.updateFilm} deleteFilm={props.deleteFilm} />
+      )}
+    </div>
+  );
 }
 
 function FilmTable(props) {
-    const films = props.films;
-
-    return (
-        <Table striped hover>
-            <thead>
-                <tr>
-                    <th scope="col">Title</th>
-                    <th scope="col">Favorite</th>
-                    <th scope="col">Date</th>
-                    <th scope="col">Rating</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {films.map((f) => <FilmRow key={f.id} film={f} updateFilm={props.updateFilm} deleteFilm={props.deleteFilm} />)}
-            </tbody>
-        </Table>
-    );
+  return (
+    <Table responsive hover borderless className="align-middle mb-0 mt-2">
+      <thead className="table-light text-muted">
+        <tr style={{ borderBottom: '2px solid #f8f9fa' }}>
+          <th className="ps-3 py-3 fw-semibold rounded-start">Titolo</th>
+          <th className="py-3 fw-semibold">Preferito</th>
+          <th className="py-3 fw-semibold">Data visione</th>
+          <th className="py-3 fw-semibold">Valutazione</th>
+          <th className="text-end pe-3 py-3 fw-semibold rounded-end">Azioni</th>
+        </tr>
+      </thead>
+      <tbody>
+        {props.films.map((f) => (
+          <FilmRow key={f.id} film={f} updateFilm={props.updateFilm} deleteFilm={props.deleteFilm} />
+        ))}
+      </tbody>
+    </Table>
+  );
 }
 
 function FilmRow(props) {
-    const f = props.film;
+  const f = props.film;
 
-    // Funzione per invertire lo stato di "preferito"
-    const toggleFavorite = () => {
-        const updatedFilm = new Film(f.id, f.title, !f.isFavorite, f.rating, f.watchDate, f.userId);
-        props.updateFilm(updatedFilm);
-    };
+  const toggleFavorite = () => {
+    props.updateFilm(new Film(f.id, f.title, !f.isFavorite, f.rating, f.watchDate, f.userId));
+  };
 
-    // Funzione per aggiornare il punteggio (rating)
-    const updateRating = (newRating) => {
-        const updatedFilm = new Film(f.id, f.title, f.isFavorite, newRating, f.watchDate, f.userId);
-        props.updateFilm(updatedFilm);
-    };
+  const updateRating = (newRating) => {
+    props.updateFilm(new Film(f.id, f.title, f.isFavorite, newRating, f.watchDate, f.userId));
+  };
 
-    // Funzione helper per renderizzare le stelline piene/vuote
-    const renderStars = (rating) => {
-        const stars = [];
-        for (let i = 0; i < 5; i++) {
-            if (rating && i < rating) stars.push(<StarFill key={i} onClick={() => updateRating(i + 1)} style={{ cursor: 'pointer' }} />);
-            else stars.push(<Star key={i} onClick={() => updateRating(i + 1)} style={{ cursor: 'pointer' }} />);
-        }
-        return stars;
-    };
-
-    return (
-        <tr>
-            <td>{f.title}</td>
-            <td onClick={toggleFavorite} style={{ cursor: 'pointer' }}>
-                {f.isFavorite ? <HeartFill color="red" /> : <Heart />}
-            </td>
-            <td>{f.watchDate ? f.watchDate.format('YYYY-MM-DD') : ''}</td>
-            <td>{renderStars(f.rating)}</td>
-            <FilmActionButtons film={f} updateFilm={props.updateFilm} deleteFilm={props.deleteFilm} />
-        </tr>
+  const renderStars = (rating) =>
+    Array.from({ length: 5 }, (_, i) =>
+      rating && i < rating
+        ? <StarFill key={i} className="star-icon filled" onClick={() => updateRating(i + 1)} />
+        : <Star     key={i} className="star-icon"        onClick={() => updateRating(i + 1)} />
     );
+
+  return (
+    <tr style={{ borderBottom: '1px solid #f8f9fa' }}>
+      <td className="film-title-cell ps-3 fw-bold text-dark fs-6">{f.title}</td>
+      <td onClick={toggleFavorite} style={{ cursor: 'pointer' }}>
+        {f.isFavorite
+          ? <HeartFill className="text-danger fs-4 shadow-sm rounded-circle p-2 bg-danger bg-opacity-10" style={{ transition: 'transform 0.2s', width: '38px', height:'38px' }} />
+          : <Heart     className="text-secondary fs-4 p-2" style={{ width: '38px', height:'38px' }} />}
+      </td>
+      <td>
+        {f.watchDate
+          ? <span className="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-semibold border border-primary border-opacity-25">{f.watchDate.format('DD/MM/YYYY')}</span>
+          : <span className="text-muted fst-italic fs-6 px-3 py-2">—</span>}
+      </td>
+      <td>
+        <div className="d-flex gap-1 fs-5 text-warning">{renderStars(f.rating)}</div>
+      </td>
+      <td className="text-end pe-3">
+        <div className="d-flex gap-2 justify-content-end">
+          <EditFilmButton film={f} updateFilm={props.updateFilm} />
+          <DeleteFilmButton film={f} deleteFilm={props.deleteFilm} />
+        </div>
+      </td>
+    </tr>
+  );
 }
 
-function FilmActionButtons(props) {
-    return (
-        <td>
-            <EditFilmButton film={props.film} updateFilm={props.updateFilm} />
-            <DeleteFilmButton film={props.film} deleteFilm={props.deleteFilm} />
-        </td>
-    );
-}
-
-
-function EditFilmButton(props) {
+function EditFilmButton({ film, updateFilm }) {
   const [show, setShow] = useState(false);
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
   const handleSave = (filmData) => {
-    const updatedFilm = new Film(
-      props.film.id,
-      filmData.title,
-      filmData.isFavorite,
-      filmData.rating,
-      filmData.watchDate,
-      props.film.userId
-    );
-    props.updateFilm(updatedFilm);
-    handleClose();
+    updateFilm(new Film(film.id, filmData.title, filmData.isFavorite, filmData.rating, filmData.watchDate, film.userId));
+    setShow(false);
   };
 
   return (
     <>
-      <Button variant='warning' className='me-2' onClick={handleShow}>
+      <Button variant="warning" size="sm" onClick={() => setShow(true)} title="Modifica">
         <Pencil />
       </Button>
-
-      <Modal show={show} onHide={handleClose}>
+      <Modal show={show} onHide={() => setShow(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Edit Film</Modal.Title>
+          <Modal.Title>✏️ Modifica film</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <FilmForm film={props.film} onSave={handleSave} handleClose={handleClose} />
+          <FilmForm film={film} onSave={handleSave} handleClose={() => setShow(false)} />
         </Modal.Body>
       </Modal>
     </>
   );
 }
 
-function DeleteFilmButton(props){
-    return (
-        <Button variant='danger' className='me-2' onClick={() => props.deleteFilm(props.film.id)}>
-        <Trash />
-      </Button>
-    )
+function DeleteFilmButton({ film, deleteFilm }) {
+  return (
+    <Button variant="danger" size="sm" onClick={() => deleteFilm(film.id)} title="Elimina">
+      <Trash />
+    </Button>
+  );
 }
 
 export default ListOfFilms;
